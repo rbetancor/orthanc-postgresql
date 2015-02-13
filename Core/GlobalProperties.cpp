@@ -25,8 +25,6 @@
 #include "PostgreSQLResult.h"
 #include "PostgreSQLTransaction.h"
 
-#include "EmbeddedResources.h"
-
 namespace OrthancPlugins
 {
   GlobalProperties::GlobalProperties(PostgreSQLConnection& connection,
@@ -38,10 +36,9 @@ namespace OrthancPlugins
 
     if (!connection_.DoesTableExist("GlobalProperties"))
     {
-      std::string query;
-
-      EmbeddedResources::GetFileResource(query, EmbeddedResources::GLOBAL_PROPERTIES);
-      connection_.Execute(query);
+      connection_.Execute("CREATE TABLE GlobalProperties("
+                          "property INTEGER PRIMARY KEY,"
+                          "value TEXT)");
     }
 
     transaction.Commit();
@@ -100,19 +97,27 @@ namespace OrthancPlugins
   void GlobalProperties::SetGlobalProperty(int32_t property,
                                            const char* value)
   {
-    if (setGlobalProperty_.get() == NULL)
+    if (setGlobalProperty1_.get() == NULL ||
+        setGlobalProperty2_.get() == NULL)
     {
-      // http://stackoverflow.com/a/1109198/881731
-      setGlobalProperty_.reset
+      setGlobalProperty1_.reset
         (new PostgreSQLStatement
-         (connection_, "SELECT ChangeGlobalProperty($1, $2)"));
-      setGlobalProperty_->DeclareInputInteger(0);
-      setGlobalProperty_->DeclareInputString(1);
+         (connection_, "DELETE FROM GlobalProperties WHERE property=$1"));
+      setGlobalProperty1_->DeclareInputInteger(0);
+
+      setGlobalProperty2_.reset
+        (new PostgreSQLStatement
+         (connection_, "INSERT INTO GlobalProperties VALUES ($1, $2)"));
+      setGlobalProperty2_->DeclareInputInteger(0);
+      setGlobalProperty2_->DeclareInputString(1);
     }
 
-    setGlobalProperty_->BindInteger(0, property);
-    setGlobalProperty_->BindString(1, value);
-    setGlobalProperty_->Run();
+    setGlobalProperty1_->BindInteger(0, property);
+    setGlobalProperty1_->Run();
+
+    setGlobalProperty2_->BindInteger(0, property);
+    setGlobalProperty2_->BindString(1, value);
+    setGlobalProperty2_->Run();
   }
 
 

@@ -112,11 +112,8 @@ namespace OrthancPlugins
     if (!connection_->DoesTableExist("Resources"))
     {
       std::string query;
-
       EmbeddedResources::GetFileResource(query, EmbeddedResources::POSTGRESQL_PREPARE);
-      connection_->Execute(query);
 
-      EmbeddedResources::GetFileResource(query, EmbeddedResources::POSTGRESQL_UPSERTS);
       connection_->Execute(query);
     }
 
@@ -1091,20 +1088,31 @@ namespace OrthancPlugins
                                       int32_t type,
                                       const char* value)
   {
-    if (setMetadata_.get() == NULL)
+    if (setMetadata1_.get() == NULL ||
+        setMetadata2_.get() == NULL)
     {
-      setMetadata_.reset
+      setMetadata1_.reset
         (new PostgreSQLStatement
-         (*connection_, "SELECT ChangeMetadata($1, $2, $3)"));
-      setMetadata_->DeclareInputInteger64(0);
-      setMetadata_->DeclareInputInteger(1);
-      setMetadata_->DeclareInputString(2);
+         (*connection_, "DELETE FROM Metadata WHERE id=$1 AND type=$2"));
+      setMetadata1_->DeclareInputInteger64(0);
+      setMetadata1_->DeclareInputInteger(1);
+
+      setMetadata2_.reset
+        (new PostgreSQLStatement
+         (*connection_, "INSERT INTO Metadata VALUES ($1, $2, $3)"));
+      setMetadata2_->DeclareInputInteger64(0);
+      setMetadata2_->DeclareInputInteger(1);
+      setMetadata2_->DeclareInputString(2);
     }
 
-    setMetadata_->BindInteger64(0, id);
-    setMetadata_->BindInteger(1, static_cast<int>(type));
-    setMetadata_->BindString(2, value);
-    setMetadata_->Run();
+    setMetadata1_->BindInteger64(0, id);
+    setMetadata1_->BindInteger(1, static_cast<int>(type));
+    setMetadata1_->Run();
+
+    setMetadata2_->BindInteger64(0, id);
+    setMetadata2_->BindInteger(1, static_cast<int>(type));
+    setMetadata2_->BindString(2, value);
+    setMetadata2_->Run();
   }
 
 

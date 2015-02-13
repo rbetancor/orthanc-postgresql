@@ -75,7 +75,8 @@ namespace OrthancPlugins
     std::auto_ptr<PostgreSQLStatement> selectPatientToRecycleAvoid_;
     std::auto_ptr<PostgreSQLStatement> setMainDicomTags_;
     std::auto_ptr<PostgreSQLStatement> setIdentifierTag_;
-    std::auto_ptr<PostgreSQLStatement> setMetadata_;
+    std::auto_ptr<PostgreSQLStatement> setMetadata1_;
+    std::auto_ptr<PostgreSQLStatement> setMetadata2_;
     std::auto_ptr<PostgreSQLStatement> protectPatient1_;
     std::auto_ptr<PostgreSQLStatement> protectPatient2_;
 

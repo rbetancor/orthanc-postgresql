@@ -58,6 +58,7 @@ extern "C"
       /* Create the connection to PostgreSQL */
       std::auto_ptr<OrthancPlugins::PostgreSQLConnection> pg(OrthancPlugins::CreateConnection(context_));
       pg->Open();
+      pg->ClearAll();
  
       /* Create the database back-end */
       backend_ = new OrthancPlugins::PostgreSQLWrapper(pg.release(), allowUnlock);

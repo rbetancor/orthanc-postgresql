@@ -153,6 +153,9 @@ TEST(PostgreSQLWrapper, Basic)
   db.SetGlobalProperty(GlobalProperty_AnonymizationSequence, "Hello");
   ASSERT_TRUE(db.LookupGlobalProperty(s, GlobalProperty_AnonymizationSequence));
   ASSERT_EQ("Hello", s);
+  db.SetGlobalProperty(GlobalProperty_AnonymizationSequence, "HelloWorld");
+  ASSERT_TRUE(db.LookupGlobalProperty(s, GlobalProperty_AnonymizationSequence));
+  ASSERT_EQ("HelloWorld", s);
 
   int64_t a = db.CreateResource("study", OrthancPluginResourceType_Study);
   ASSERT_TRUE(db.IsExistingResource(a));
@@ -227,8 +230,11 @@ TEST(PostgreSQLWrapper, Basic)
   ASSERT_NE(ci.front(), ci.back());
 
   db.SetMetadata(a, MetadataType_ModifiedFrom, "modified");
-  db.SetMetadata(a, MetadataType_LastUpdate, "update");
+  db.SetMetadata(a, MetadataType_LastUpdate, "update2");
   ASSERT_FALSE(db.LookupMetadata(s, b, MetadataType_LastUpdate));
+  ASSERT_TRUE(db.LookupMetadata(s, a, MetadataType_LastUpdate));
+  ASSERT_EQ("update2", s);
+  db.SetMetadata(a, MetadataType_LastUpdate, "update");
   ASSERT_TRUE(db.LookupMetadata(s, a, MetadataType_LastUpdate));
   ASSERT_EQ("update", s);
 

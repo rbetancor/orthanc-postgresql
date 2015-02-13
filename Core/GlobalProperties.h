@@ -35,7 +35,8 @@ namespace OrthancPlugins
     int32_t lockKey_;
 
     std::auto_ptr<PostgreSQLStatement> lookupGlobalProperty_;
-    std::auto_ptr<PostgreSQLStatement> setGlobalProperty_;
+    std::auto_ptr<PostgreSQLStatement> setGlobalProperty1_;
+    std::auto_ptr<PostgreSQLStatement> setGlobalProperty2_;
 
   public:
     GlobalProperties(PostgreSQLConnection& connection,
