@@ -41,6 +41,7 @@ endif()
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
   link_libraries(uuid)
+  SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
   SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -pthread")
 elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
   link_libraries(rpcrt4 ws2_32 secur32)

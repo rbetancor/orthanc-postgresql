@@ -21,7 +21,7 @@ if (STATIC_BUILD OR NOT USE_SYSTEM_BOOST)
 else()
   include(FindBoost)
   set(BOOST_STATIC 0)
-  find_package(Boost COMPONENTS )
+  find_package(Boost COMPONENTS system)
 
   if (NOT Boost_FOUND)
     message(FATAL_ERROR "Unable to locate Boost on this system")

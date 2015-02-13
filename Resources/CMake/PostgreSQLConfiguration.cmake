@@ -180,7 +180,7 @@ else()
   include(${CMAKE_SOURCE_DIR}/Resources/CMake/FindPostgreSQL.cmake)
   include_directories(
     ${PostgreSQL_INCLUDE_DIR}
-    ${PostgreSQL_INCLUDE_DIR}/internal
+    ${PostgreSQL_TYPE_INCLUDE_DIR}
     )
   link_libraries(${PostgreSQL_LIBRARY})
 endif()
