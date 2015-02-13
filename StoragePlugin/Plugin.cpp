@@ -89,7 +89,7 @@ extern "C"
   ORTHANC_PLUGINS_API int32_t OrthancPluginInitialize(OrthancPluginContext* context)
   {
     context_ = context;
-    OrthancPluginLogWarning(context, "Using PostgreSQL storage area");
+    OrthancPluginLogWarning(context_, "Using PostgreSQL storage area");
 
     /* Check the version of the Orthanc core */
     if (OrthancPluginCheckVersion(context_) == 0)
@@ -100,7 +100,7 @@ extern "C"
               ORTHANC_PLUGINS_MINIMAL_MAJOR_NUMBER,
               ORTHANC_PLUGINS_MINIMAL_MINOR_NUMBER,
               ORTHANC_PLUGINS_MINIMAL_REVISION_NUMBER);
-      OrthancPluginLogError(context, info);
+      OrthancPluginLogError(context_, info);
       return -1;
     }
 
@@ -118,7 +118,7 @@ extern "C"
       storage_ = new OrthancPlugins::PostgreSQLStorageArea(pg.release(), allowUnlock);
 
       /* Register the storage area into Orthanc */
-      OrthancPluginRegisterStorageArea(context, StorageCreate, StorageRead, StorageRemove);
+      OrthancPluginRegisterStorageArea(context_, StorageCreate, StorageRead, StorageRemove);
     }
     catch (std::runtime_error& e)
     {

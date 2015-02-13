@@ -34,7 +34,7 @@ extern "C"
   ORTHANC_PLUGINS_API int32_t OrthancPluginInitialize(OrthancPluginContext* context)
   {
     context_ = context;
-    OrthancPluginLogWarning(context, "Using PostgreSQL index");
+    OrthancPluginLogWarning(context_, "Using PostgreSQL index");
 
     /* Check the version of the Orthanc core */
     if (OrthancPluginCheckVersion(context_) == 0)
@@ -45,7 +45,7 @@ extern "C"
               ORTHANC_PLUGINS_MINIMAL_MAJOR_NUMBER,
               ORTHANC_PLUGINS_MINIMAL_MINOR_NUMBER,
               ORTHANC_PLUGINS_MINIMAL_REVISION_NUMBER);
-      OrthancPluginLogError(context, info);
+      OrthancPluginLogError(context_, info);
       return -1;
     }
 
@@ -63,7 +63,7 @@ extern "C"
       backend_ = new OrthancPlugins::PostgreSQLWrapper(pg.release(), allowUnlock);
 
       /* Register the PostgreSQL index into Orthanc */
-      OrthancPlugins::DatabaseBackendAdapter::Register(context, *backend_);
+      OrthancPlugins::DatabaseBackendAdapter::Register(context_, *backend_);
     }
     catch (std::runtime_error& e)
     {
