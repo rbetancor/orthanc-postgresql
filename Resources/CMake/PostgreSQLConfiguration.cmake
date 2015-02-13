@@ -178,6 +178,9 @@ if (STATIC_BUILD OR NOT USE_SYSTEM_LIBPQ)
 
 else()
   include(${CMAKE_SOURCE_DIR}/Resources/CMake/FindPostgreSQL.cmake)
-  include_directories(${PostgreSQL_INCLUDE_DIR})
+  include_directories(
+    ${PostgreSQL_INCLUDE_DIR}
+    ${PostgreSQL_INCLUDE_DIR}/internal
+    )
   link_libraries(${PostgreSQL_LIBRARY})
 endif()
