@@ -44,8 +44,9 @@ namespace OrthancPlugins
     void Prepare();
 
   public:
-    PostgreSQLStorageArea(PostgreSQLConnection* db,
-                          bool allowUnlock);   // Takes the ownership
+    PostgreSQLStorageArea(PostgreSQLConnection* db,   // Takes the ownership
+                          bool useLock,
+                          bool allowUnlock);
 
     ~PostgreSQLStorageArea();
 

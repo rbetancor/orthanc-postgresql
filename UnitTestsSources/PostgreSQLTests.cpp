@@ -30,7 +30,7 @@
 
 using namespace OrthancPlugins;
 
-extern PostgreSQLConnection* CreateTestConnection();
+extern PostgreSQLConnection* CreateTestConnection(bool clearAll);
 
 
 static int64_t CountLargeObjects(PostgreSQLConnection& db)
@@ -45,7 +45,7 @@ static int64_t CountLargeObjects(PostgreSQLConnection& db)
 
 TEST(PostgreSQL, Basic)
 {
-  std::auto_ptr<PostgreSQLConnection> pg(CreateTestConnection());
+  std::auto_ptr<PostgreSQLConnection> pg(CreateTestConnection(true));
 
   ASSERT_FALSE(pg->DoesTableExist("Test"));
   pg->Execute("CREATE TABLE Test(name INTEGER, value BIGINT)");
@@ -118,7 +118,7 @@ TEST(PostgreSQL, Basic)
 
 TEST(PostgreSQL, String)
 {
-  std::auto_ptr<PostgreSQLConnection> pg(CreateTestConnection());
+  std::auto_ptr<PostgreSQLConnection> pg(CreateTestConnection(true));
 
   pg->Execute("CREATE TABLE Test(name INTEGER, value VARCHAR(40))");
 
@@ -164,7 +164,7 @@ TEST(PostgreSQL, String)
 
 TEST(PostgreSQL, Transaction)
 {
-  std::auto_ptr<PostgreSQLConnection> pg(CreateTestConnection());
+  std::auto_ptr<PostgreSQLConnection> pg(CreateTestConnection(true));
 
   pg->Execute("CREATE TABLE Test(name INTEGER, value INTEGER)");
 
@@ -232,7 +232,7 @@ TEST(PostgreSQL, Transaction)
 
 TEST(PostgreSQL, LargeObject)
 {
-  std::auto_ptr<PostgreSQLConnection> pg(CreateTestConnection());
+  std::auto_ptr<PostgreSQLConnection> pg(CreateTestConnection(true));
   ASSERT_EQ(0, CountLargeObjects(*pg));
 
   pg->Execute("CREATE TABLE Test(name VARCHAR, value OID)");
@@ -311,8 +311,8 @@ TEST(PostgreSQL, LargeObject)
 
 TEST(PostgreSQL, StorageArea)
 {
-  std::auto_ptr<PostgreSQLConnection> pg(CreateTestConnection());
-  PostgreSQLStorageArea s(pg.release(), true);
+  std::auto_ptr<PostgreSQLConnection> pg(CreateTestConnection(true));
+  PostgreSQLStorageArea s(pg.release(), true, true);
 
   ASSERT_EQ(0, CountLargeObjects(s.GetConnection()));
   

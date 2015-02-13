@@ -28,9 +28,10 @@
 namespace OrthancPlugins
 {  
   PostgreSQLStorageArea::PostgreSQLStorageArea(PostgreSQLConnection* db,
+                                               bool useLock,
                                                bool allowUnlock) : 
     db_(db),
-    globalProperties_(*db, GlobalProperty_StorageLock)
+    globalProperties_(*db, useLock, GlobalProperty_StorageLock)
   {
     globalProperties_.Lock(allowUnlock);
 

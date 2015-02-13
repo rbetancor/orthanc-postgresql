@@ -47,7 +47,8 @@ namespace OrthancPlugins
                       const std::string& key,
                       int defaultValue);
 
-  PostgreSQLConnection* CreateConnection(OrthancPluginContext* context);
+  PostgreSQLConnection* CreateConnection(bool& useLock,
+                                         OrthancPluginContext* context);
 
   std::string GenerateUuid();
 

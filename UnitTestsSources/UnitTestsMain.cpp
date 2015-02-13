@@ -27,7 +27,7 @@
 static int argc_;
 static char** argv_;
 
-OrthancPlugins::PostgreSQLConnection* CreateTestConnection()
+OrthancPlugins::PostgreSQLConnection* CreateTestConnection(bool clearAll)
 {
   std::auto_ptr<OrthancPlugins::PostgreSQLConnection> pg(new OrthancPlugins::PostgreSQLConnection);
 
@@ -38,7 +38,11 @@ OrthancPlugins::PostgreSQLConnection* CreateTestConnection()
   pg->SetDatabase(argv_[5]);
   
   pg->Open();
-  pg->ClearAll();
+
+  if (clearAll)
+  {
+    pg->ClearAll();
+  }
 
   return pg.release();
 }
@@ -47,7 +51,7 @@ OrthancPlugins::PostgreSQLConnection* CreateTestConnection()
 
 int main(int argc, char **argv)
 {
-  if (argc != 6)
+  if (argc < 6)
   {
     std::cerr << "Usage: " << argv[0] << " <host> <port> <username> <password> <database>"
               << std::endl << std::endl

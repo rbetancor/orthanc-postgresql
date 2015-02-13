@@ -28,8 +28,10 @@
 namespace OrthancPlugins
 {
   GlobalProperties::GlobalProperties(PostgreSQLConnection& connection,
+                                     bool useLock,
                                      int32_t lockKey) :
     connection_(connection),
+    useLock_(useLock),
     lockKey_(lockKey)
   {
     PostgreSQLTransaction transaction(connection_);
@@ -47,24 +49,27 @@ namespace OrthancPlugins
 
   void GlobalProperties::Lock(bool allowUnlock)
   {
-    PostgreSQLTransaction transaction(connection_);
-
-    // Check the lock
-    if (!allowUnlock)
+    if (useLock_)
     {
-      std::string lock = "0";
-      if (LookupGlobalProperty(lock, lockKey_) &&
-          lock != "0")
+      PostgreSQLTransaction transaction(connection_);
+
+      // Check the lock
+      if (!allowUnlock)
       {
-        throw PostgreSQLException("The database is locked by another instance of Orthanc. "
-                                  "Use \"" + FLAG_UNLOCK + "\" to manually remove the lock.");
+        std::string lock = "0";
+        if (LookupGlobalProperty(lock, lockKey_) &&
+            lock != "0")
+        {
+          throw PostgreSQLException("The database is locked by another instance of Orthanc. "
+                                    "Use \"" + FLAG_UNLOCK + "\" to manually remove the lock.");
+        }
       }
+
+      // Lock the database
+      SetGlobalProperty(lockKey_, "1");             
+
+      transaction.Commit();
     }
-
-    // Lock the database
-    SetGlobalProperty(lockKey_, "1");             
-
-    transaction.Commit();
   }
 
 
@@ -123,9 +128,12 @@ namespace OrthancPlugins
 
   void GlobalProperties::Unlock()
   {
-    // Remove the lock
-    PostgreSQLTransaction transaction(connection_);
-    SetGlobalProperty(lockKey_, "0");
-    transaction.Commit();
+    if (useLock_)
+    {
+      // Remove the lock
+      PostgreSQLTransaction transaction(connection_);
+      SetGlobalProperty(lockKey_, "0");
+      transaction.Commit();
+    }
   }
 }

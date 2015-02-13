@@ -31,9 +31,10 @@
 namespace OrthancPlugins
 {
   PostgreSQLWrapper::PostgreSQLWrapper(PostgreSQLConnection* connection,
+                                       bool useLock,
                                        bool allowUnlock) :
     connection_(connection),
-    globalProperties_(*connection, GlobalProperty_IndexLock)
+    globalProperties_(*connection, useLock, GlobalProperty_IndexLock)
   {
     globalProperties_.Lock(allowUnlock);
 

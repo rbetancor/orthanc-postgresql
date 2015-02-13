@@ -103,6 +103,7 @@ namespace OrthancPlugins
 
   public:
     PostgreSQLWrapper(PostgreSQLConnection* connection,  // Takes the ownership of the connection
+                      bool useLock,
                       bool allowUnlock);
 
     virtual ~PostgreSQLWrapper();

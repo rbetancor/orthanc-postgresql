@@ -28,7 +28,7 @@
 
 using namespace OrthancPlugins;
 
-extern PostgreSQLConnection* CreateTestConnection();
+extern PostgreSQLConnection* CreateTestConnection(bool clearAll);
 
 
 // From Orthanc enumerations 
@@ -134,7 +134,7 @@ static int32_t InvokeService(struct _OrthancPluginContext_t* context,
 
 TEST(PostgreSQLWrapper, Basic)
 {
-  std::auto_ptr<PostgreSQLConnection> pg(CreateTestConnection());
+  std::auto_ptr<PostgreSQLConnection> pg(CreateTestConnection(true));
 
   OrthancPluginContext context;
   context.pluginsManager = NULL;
@@ -142,7 +142,7 @@ TEST(PostgreSQLWrapper, Basic)
   context.Free = ::free;
   context.InvokeService = InvokeService;
 
-  PostgreSQLWrapper db(pg.release(), true);
+  PostgreSQLWrapper db(pg.release(), true, true);
   db.RegisterOutput(new DatabaseBackendOutput(&context, NULL));
 
   std::string s;
@@ -414,4 +414,12 @@ TEST(PostgreSQLWrapper, Basic)
   db.DeleteResource(p2);
   ASSERT_TRUE(db.SelectPatientToRecycle(r, p3));
   ASSERT_EQ(p1, r);
+}
+
+
+TEST(PostgreSQLWrapper, Lock)
+{
+  PostgreSQLWrapper db1(CreateTestConnection(true), true, false);
+  PostgreSQLWrapper db2(CreateTestConnection(false), false, false);
+  ASSERT_THROW(OrthancPlugins::PostgreSQLWrapper db3(CreateTestConnection(false), true, false), std::runtime_error);
 }

@@ -32,6 +32,7 @@ namespace OrthancPlugins
   {
   private:
     PostgreSQLConnection& connection_;
+    bool useLock_;
     int32_t lockKey_;
 
     std::auto_ptr<PostgreSQLStatement> lookupGlobalProperty_;
@@ -40,6 +41,7 @@ namespace OrthancPlugins
 
   public:
     GlobalProperties(PostgreSQLConnection& connection,
+                     bool useLock,
                      int32_t lockKey);
 
     void Lock(bool allowUnlock);
