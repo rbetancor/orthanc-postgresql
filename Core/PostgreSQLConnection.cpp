@@ -44,7 +44,7 @@ namespace OrthancPlugins
     }
   }
 
-
+  
   PostgreSQLConnection::PostgreSQLConnection()
   {
     pg_ = NULL;
@@ -53,6 +53,7 @@ namespace OrthancPlugins
     username_ = "postgres";
     password_ = "postgres";
     database_ = "";
+    uri_.clear();
   }
 
   
@@ -67,33 +68,59 @@ namespace OrthancPlugins
   }
 
 
+  void PostgreSQLConnection::SetConnectionUri(const std::string& uri)
+  {
+    Close();
+    uri_ = uri;
+  }
+
+
+  std::string PostgreSQLConnection::GetConnectionUri() const
+  {
+    if (uri_.empty())
+    {
+      return ("postgresql://" + username_ + ":" + password_ + "@" + 
+              host_ + ":" + boost::lexical_cast<std::string>(port_) + "/" + database_);
+    }
+    else
+    {
+      return uri_;
+    }
+  }
+
+
   void PostgreSQLConnection::SetHost(const std::string& host)
   {
     Close();
+    uri_.clear();
     host_ = host;
   }
 
   void PostgreSQLConnection::SetPortNumber(uint16_t port)
   {
     Close();
+    uri_.clear();
     port_ = port;
   }
 
   void PostgreSQLConnection::SetUsername(const std::string& username)
   {
     Close();
+    uri_.clear();
     username_ = username;
   }
 
   void PostgreSQLConnection::SetPassword(const std::string& password)
   {
     Close();
+    uri_.clear();
     password_ = password;
   }
 
   void PostgreSQLConnection::SetDatabase(const std::string& database)
   {
     Close();
+    uri_.clear();
     database_ = database;
   }
 
@@ -105,16 +132,24 @@ namespace OrthancPlugins
       return;
     }
 
-    std::string s =
-      std::string(" sslmode=disable") +   // TODO WHY SSL DOES NOT WORK? ("SSL error: wrong version number")
-      " user=" + username_ + 
-      " password=" + password_ + 
-      " host=" + host_ + 
-      " port=" + boost::lexical_cast<std::string>(port_);
+    std::string s;
 
-    if (database_.size() > 0)
+    if (uri_.empty())
     {
-      s += " dbname=" + database_;
+      s = std::string("sslmode=disable") +   // TODO WHY SSL DOES NOT WORK? ("SSL error: wrong version number")
+        " user=" + username_ + 
+        " password=" + password_ + 
+        " host=" + host_ + 
+        " port=" + boost::lexical_cast<std::string>(port_);
+
+      if (database_.size() > 0)
+      {
+        s += " dbname=" + database_;
+      }
+    }
+    else
+    {
+      s = uri_;
     }
 
     pg_ = PQconnectdb(s.c_str());

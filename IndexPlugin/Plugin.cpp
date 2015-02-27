@@ -59,6 +59,7 @@ extern "C"
       bool useLock;
       std::auto_ptr<OrthancPlugins::PostgreSQLConnection> pg(OrthancPlugins::CreateConnection(useLock, context_));
       pg->Open();
+      std::cout << "******** " << pg->GetConnectionUri() << std::endl;
       //pg->ClearAll();   // Reset the database
  
       /* Create the database back-end */

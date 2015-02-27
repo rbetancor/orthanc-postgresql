@@ -49,6 +49,7 @@ namespace OrthancPlugins
     std::string username_;
     std::string password_;
     std::string database_;
+    std::string uri_;
     void* pg_;   /* Object of type "PGconn*" */
 
     void Close();
@@ -62,6 +63,10 @@ namespace OrthancPlugins
     {
       Close();
     }
+
+    void SetConnectionUri(const std::string& uri);
+
+    std::string GetConnectionUri() const;
 
     void SetHost(const std::string& host);
 

@@ -121,12 +121,19 @@ namespace OrthancPlugins
 
     if (configuration.isMember("PostgreSQL"))
     {
-      Json::Value c = configuration["PostgreSQL"];  
-      connection->SetHost(GetStringValue(c, "Host", "localhost"));
-      connection->SetPortNumber(GetIntegerValue(c, "Port", 5432));
-      connection->SetDatabase(GetStringValue(c, "Database", "orthanc"));
-      connection->SetUsername(GetStringValue(c, "Username", "orthanc"));
-      connection->SetPassword(GetStringValue(c, "Password", "orthanc"));
+      Json::Value c = configuration["PostgreSQL"];
+      if (c.isMember("ConnectionUri"))
+      {
+        connection->SetConnectionUri(c["ConnectionUri"].asString());
+      }
+      else
+      {
+        connection->SetHost(GetStringValue(c, "Host", "localhost"));
+        connection->SetPortNumber(GetIntegerValue(c, "Port", 5432));
+        connection->SetDatabase(GetStringValue(c, "Database", "orthanc"));
+        connection->SetUsername(GetStringValue(c, "Username", "orthanc"));
+        connection->SetPassword(GetStringValue(c, "Password", "orthanc"));
+      }
 
       if (c.isMember("Lock") &&
           c["Lock"].type() == Json::booleanValue)
