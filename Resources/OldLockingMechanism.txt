@@ -1,0 +1,38 @@
+LOCKING
+=======
+
+This text file archives information about the locking mechanism in the
+initial release of the PostgreSQL plugins. THIS INFORMATION IS NOT
+VALID ANYMORE!
+
+
+>>>>>>>>
+
+The plugins implement a locking system to prevent other instances of Orthanc from using the same PostgreSQL database. If for some reason, Orthanc has not properly shutdown (for instance because of a power outage), you will have to manually unlock the database. This can be done by adding the `--unlock` flag at the command line:
+
+{{{
+# ./Orthanc Configuration.json --unlock
+}}}
+
+If you dislike the locking mechanism and wish to disable it, set the "`Lock`" option to `false` in the configuration:
+
+<code language="json">
+{
+  "Name" : "MyOrthanc",
+  [...]
+  "PostgreSQL" : {
+    "Lock" : false,
+    "EnableIndex" : true,
+    "EnableStorage" : true,
+    "Host" : "localhost",
+    "Port" : 5432,
+    "Database" : "orthanc",
+    "Username" : "orthanc",
+    "Password" : "orthanc"    
+  },
+  "Plugins" : [
+    "/home/user/OrthancPostgreSQL/Build/libOrthancPostgreSQLIndex.so",
+    "/home/user/OrthancPostgreSQL/Build/libOrthancPostgreSQLStorage.so"
+  ]
+}
+</code>
