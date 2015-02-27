@@ -98,6 +98,14 @@ namespace OrthancPlugins
     return PQgetisnull(reinterpret_cast<PGresult*>(result_), position_, column) != 0;
   }
 
+  bool PostgreSQLResult::GetBoolean(unsigned int column) const
+  {
+    CheckColumn(column, BOOLOID);
+    assert(PQfsize(reinterpret_cast<PGresult*>(result_), column) == 1);
+    const uint8_t *v = reinterpret_cast<const uint8_t*>(PQgetvalue(reinterpret_cast<PGresult*>(result_), position_, column));
+    return (v[0] != 0);
+  }
+
   int PostgreSQLResult::GetInteger(unsigned int column) const
   {
     CheckColumn(column, INT4OID);

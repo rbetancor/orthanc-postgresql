@@ -1,4 +1,10 @@
-Version 1.0.0 (2015/02/06)
-==========================
+Pending changes in the mainline
+===============================
+
+* Use of advisory locks
+
+
+2015/02/06
+==========
 
 * Initial release

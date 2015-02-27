@@ -25,6 +25,8 @@
 #include "PostgreSQLResult.h"
 #include "PostgreSQLTransaction.h"
 
+#define USE_ADVISORY_LOCK  1
+
 namespace OrthancPlugins
 {
   GlobalProperties::GlobalProperties(PostgreSQLConnection& connection,
@@ -53,6 +55,20 @@ namespace OrthancPlugins
     {
       PostgreSQLTransaction transaction(connection_);
 
+#if USE_ADVISORY_LOCK == 1
+      PostgreSQLStatement s(connection_, "select pg_try_advisory_lock($1);");
+      s.DeclareInputInteger(0);
+      s.BindInteger(0, lockKey_);
+
+      PostgreSQLResult result(s);
+      if (result.IsDone() ||
+          !result.GetBoolean(0))
+      {
+        throw PostgreSQLException("The database is locked by another instance of Orthanc.");
+      }
+#else
+      PostgreSQLTransaction transaction(connection_);
+
       // Check the lock
       if (!allowUnlock)
       {
@@ -67,6 +83,7 @@ namespace OrthancPlugins
 
       // Lock the database
       SetGlobalProperty(lockKey_, "1");             
+#endif
 
       transaction.Commit();
     }
@@ -130,10 +147,14 @@ namespace OrthancPlugins
   {
     if (useLock_)
     {
+#if USE_ADVISORY_LOCK == 1
+      // Nothing to do, the lock is released after the connection is closed
+#else
       // Remove the lock
       PostgreSQLTransaction transaction(connection_);
       SetGlobalProperty(lockKey_, "0");
       transaction.Commit();
+#endif
     }
   }
 }

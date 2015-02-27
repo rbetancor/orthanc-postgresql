@@ -54,6 +54,8 @@ namespace OrthancPlugins
 
     bool IsNull(unsigned int column) const;
 
+    bool GetBoolean(unsigned int column) const;
+
     int GetInteger(unsigned int column) const;
 
     int64_t GetInteger64(unsigned int column) const;
