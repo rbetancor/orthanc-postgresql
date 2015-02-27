@@ -47,8 +47,13 @@ namespace OrthancPlugins
                       const std::string& key,
                       int defaultValue);
 
+  bool GetBooleanValue(const Json::Value& configuration,
+                       const std::string& key,
+                       bool defaultValue);
+  
   PostgreSQLConnection* CreateConnection(bool& useLock,
-                                         OrthancPluginContext* context);
+                                         OrthancPluginContext* context,
+                                         const Json::Value& configuration);
 
   std::string GenerateUuid();
 

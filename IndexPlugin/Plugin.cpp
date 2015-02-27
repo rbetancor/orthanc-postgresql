@@ -34,7 +34,6 @@ extern "C"
   ORTHANC_PLUGINS_API int32_t OrthancPluginInitialize(OrthancPluginContext* context)
   {
     context_ = context;
-    OrthancPluginLogWarning(context_, "Using PostgreSQL index");
 
     /* Check the version of the Orthanc core */
     if (OrthancPluginCheckVersion(context_) == 0)
@@ -49,17 +48,38 @@ extern "C"
       return -1;
     }
 
-    bool allowUnlock = OrthancPlugins::IsFlagInCommandLineArguments(context_, FLAG_UNLOCK);
-
     OrthancPluginSetDescription(context_, "Stores the Orthanc index into a PostgreSQL database.");
+
+
+    Json::Value configuration;
+    if (!OrthancPlugins::ReadConfiguration(configuration, context))
+    {
+      OrthancPluginLogError(context_, "Unable to read the configuration file");
+      return -1;
+    }
+
+    if (!configuration.isMember("PostgreSQL") ||
+        configuration["PostgreSQL"].type() != Json::objectValue ||
+        !OrthancPlugins::GetBooleanValue(configuration["PostgreSQL"], "EnableIndex", false))
+    {
+      OrthancPluginLogWarning(context_, "The PostgreSQL index is currently disabled, set \"EnableIndex\" to \"true\" in the \"PostgreSQL\" section of the configuration file of Orthanc");
+      return 0;
+    }
+    else
+    {
+      OrthancPluginLogWarning(context_, "Using PostgreSQL index");
+    }
+
+    bool allowUnlock = OrthancPlugins::IsFlagInCommandLineArguments(context_, FLAG_UNLOCK);
 
     try
     {
       /* Create the connection to PostgreSQL */
       bool useLock;
-      std::auto_ptr<OrthancPlugins::PostgreSQLConnection> pg(OrthancPlugins::CreateConnection(useLock, context_));
+      std::auto_ptr<OrthancPlugins::PostgreSQLConnection> 
+        pg(OrthancPlugins::CreateConnection(useLock, context_, configuration));
+
       pg->Open();
-      std::cout << "******** " << pg->GetConnectionUri() << std::endl;
       //pg->ClearAll();   // Reset the database
  
       /* Create the database back-end */

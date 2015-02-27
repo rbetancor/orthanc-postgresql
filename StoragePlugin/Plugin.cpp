@@ -89,7 +89,6 @@ extern "C"
   ORTHANC_PLUGINS_API int32_t OrthancPluginInitialize(OrthancPluginContext* context)
   {
     context_ = context;
-    OrthancPluginLogWarning(context_, "Using PostgreSQL storage area");
 
     /* Check the version of the Orthanc core */
     if (OrthancPluginCheckVersion(context_) == 0)
@@ -104,15 +103,39 @@ extern "C"
       return -1;
     }
 
-    bool allowUnlock = OrthancPlugins::IsFlagInCommandLineArguments(context_, FLAG_UNLOCK);
-
     OrthancPluginSetDescription(context_, "Stores the files received by Orthanc into a PostgreSQL database.");
+
+
+    Json::Value configuration;
+    if (!OrthancPlugins::ReadConfiguration(configuration, context))
+    {
+      OrthancPluginLogError(context_, "Unable to read the configuration file");
+      return -1;
+    }
+
+
+    if (!configuration.isMember("PostgreSQL") ||
+        configuration["PostgreSQL"].type() != Json::objectValue ||
+        !OrthancPlugins::GetBooleanValue(configuration["PostgreSQL"], "EnableStorage", false))
+    {
+      OrthancPluginLogWarning(context_, "The PostgreSQL storage area is currently disabled, set \"EnableStorage\" to \"true\" in the \"PostgreSQL\" section of the configuration file of Orthanc");
+      return 0;
+    }
+    else
+    {
+      OrthancPluginLogWarning(context_, "Using PostgreSQL storage are");
+    }
+
+
+    bool allowUnlock = OrthancPlugins::IsFlagInCommandLineArguments(context_, FLAG_UNLOCK);
 
     try
     {
       /* Create the connection to PostgreSQL */
       bool useLock;
-      std::auto_ptr<OrthancPlugins::PostgreSQLConnection> pg(OrthancPlugins::CreateConnection(useLock, context_));
+      std::auto_ptr<OrthancPlugins::PostgreSQLConnection> 
+        pg(OrthancPlugins::CreateConnection(useLock, context_, configuration));
+
       pg->Open();
       //pg->ClearAll();   // Reset the database
 

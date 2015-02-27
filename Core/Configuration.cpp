@@ -107,15 +107,27 @@ namespace OrthancPlugins
   }
 
 
-  PostgreSQLConnection* CreateConnection(bool& useLock,
-                                         OrthancPluginContext* context)
+  bool GetBooleanValue(const Json::Value& configuration,
+                       const std::string& key,
+                       bool defaultValue)
   {
-    Json::Value configuration;
-    if (!ReadConfiguration(configuration, context))
+    if (configuration.type() != Json::objectValue ||
+        !configuration.isMember(key) ||
+        configuration[key].type() != Json::booleanValue)
     {
-      return NULL;
+      return defaultValue;
     }
+    else
+    {
+      return configuration[key].asBool();
+    }
+  }
 
+
+  PostgreSQLConnection* CreateConnection(bool& useLock,
+                                         OrthancPluginContext* context,
+                                         const Json::Value& configuration)
+  {
     useLock = true;  // Use locking by default
     std::auto_ptr<PostgreSQLConnection> connection(new PostgreSQLConnection);
 
@@ -135,11 +147,7 @@ namespace OrthancPlugins
         connection->SetPassword(GetStringValue(c, "Password", "orthanc"));
       }
 
-      if (c.isMember("Lock") &&
-          c["Lock"].type() == Json::booleanValue)
-      {
-        useLock = c["Lock"].asBool();
-      }
+      useLock = GetBooleanValue(c, "Lock", useLock);
     }
 
     if (!useLock)
