@@ -123,7 +123,7 @@ extern "C"
     }
     else
     {
-      OrthancPluginLogWarning(context_, "Using PostgreSQL storage are");
+      OrthancPluginLogWarning(context_, "Using PostgreSQL storage area");
     }
 
 
