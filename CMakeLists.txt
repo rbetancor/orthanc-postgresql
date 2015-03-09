@@ -20,6 +20,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project(OrthancPostgreSQL)
 
+set(ORTHANC_POSTGRESQL_VERSION "1.0")
+
 # Parameters of the build
 set(STATIC_BUILD OFF CACHE BOOL "Static build of the third-party libraries (necessary for Windows)")
 set(ALLOW_DOWNLOADS OFF CACHE BOOL "Allow CMake to download packages")
@@ -123,6 +125,20 @@ add_library(OrthancPostgreSQLIndex
   ${CMAKE_SOURCE_DIR}/IndexPlugin/PostgreSQLWrapper.cpp
   ${CMAKE_SOURCE_DIR}/IndexPlugin/Plugin.cpp
   )
+
+
+message("Setting the version of the libraries to ${ORTHANC_POSTGRESQL_VERSION}")
+
+set_target_properties(OrthancPostgreSQLStorage PROPERTIES 
+  VERSION ${ORTHANC_POSTGRESQL_VERSION} 
+  SOVERSION ${ORTHANC_POSTGRESQL_VERSION}
+  )
+
+set_target_properties(OrthancPostgreSQLIndex PROPERTIES 
+  VERSION ${ORTHANC_POSTGRESQL_VERSION} 
+  SOVERSION ${ORTHANC_POSTGRESQL_VERSION}
+  )
+
 
 add_executable(UnitTests
   ${CORE_SOURCES}
