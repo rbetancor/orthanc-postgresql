@@ -153,10 +153,13 @@ if (STATIC_BUILD OR NOT USE_SYSTEM_LIBPQ)
       ${PQ_SOURCES_DIR}/src/port/pgsleep.c
       ${PQ_SOURCES_DIR}/src/port/snprintf.c
       ${PQ_SOURCES_DIR}/src/port/system.c 
-      ${PQ_SOURCES_DIR}/src/port/win32error.c
       ${PQ_SOURCES_DIR}/src/port/win32setlocale.c
       ${PQ_SOURCES_DIR}/src/port/getaddrinfo.c
       )
+      
+    if (${CMAKE_COMPILER_IS_GNUCXX})
+      LIST(APPEND LIBPQ_SOURCES ${PQ_SOURCES_DIR}/src/port/win32error.c)
+    endif()
   endif()
 
   if (${CMAKE_COMPILER_IS_GNUCXX})
