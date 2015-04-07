@@ -30,6 +30,10 @@
 #include <c.h>
 #include <catalog/pg_type.h>
 
+#ifdef __FreeBSD__
+#include <arpa/inet.h>    // ntohl()
+#endif
+
 
 namespace OrthancPlugins
 {
